@@ -2,7 +2,7 @@ import sys
 import math
 from PyQt5.QtCore import QRectF
 from PyQt5.QtGui import QPainter
-from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout
+from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout, QLabel, QSpinBox
 
 radians = 2.0 * math.pi
 
@@ -17,7 +17,8 @@ def getLineSegments(multiplier, modulus, radius):
 
     for start in range(modulus):
         end = (start * multiplier) % modulus
-        segments.append( (pointToCoords(start, modulus, radius), pointToCoords(end, modulus, radius)) )
+        segments.append( (pointToCoords(start, modulus, radius),
+                          pointToCoords(end, modulus, radius)) )
 
     return segments
 
@@ -31,9 +32,11 @@ class CircleWidget(QWidget):
         
     def setMultiplier(self, multiplier):
         self.multiplier = multiplier
+        self.update()
         
     def setModulus(self, modulus):
         self.modulus = modulus
+        self.update()
         
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -45,7 +48,7 @@ class CircleWidget(QWidget):
         
         painter.drawEllipse(QRectF(-radius, -radius, diameter, diameter))
 
-        segments = getLineSegments(10, 200, radius)
+        segments = getLineSegments(self.multiplier, self.modulus, radius)
         for segment in segments:
             start = segment[0]
             end = segment[1]
@@ -57,6 +60,8 @@ class MainWindow(QWidget):
     
     def __init__(self):
         super().__init__()
+        self.multiplier = 2
+        self.modulus = 10
         self.initUI()
         
     def initUI(self):
@@ -65,13 +70,39 @@ class MainWindow(QWidget):
         self.setLayout(layout)
         
         # Add the circle widget
-        circle = CircleWidget()
-        layout.addWidget(circle)
+        self.circle = CircleWidget()
+        self.circle.setMultiplier(self.multiplier)
+        self.circle.setModulus(self.modulus)
+        layout.addWidget(self.circle)
+        
+        # Add the buttons
+        buttons = QWidget()
+        buttons_layout = QVBoxLayout()
+        buttons.setLayout(buttons_layout)
+        
+        buttons_layout.addWidget(QLabel('multiplier:'))
+        self.mult_spinner = QSpinBox()
+        self.mult_spinner.setValue(self.multiplier)
+        self.mult_spinner.valueChanged.connect(self.multiplierChanged)
+        buttons_layout.addWidget(self.mult_spinner)
+        
+        buttons_layout.addWidget(QLabel('modulus:'))
+        self.mod_spinner = QSpinBox()
+        self.mod_spinner.setValue(self.modulus)
+        self.mod_spinner.valueChanged.connect(self.modulusChanged)
+        buttons_layout.addWidget(self.mod_spinner)
+        layout.addWidget(buttons)
         
         self.setGeometry(200, 200, 800, 600)
         self.setWindowTitle('Multiplication Circle')
         self.show()
         
+    def multiplierChanged(self, multiplier):
+        self.circle.setMultiplier(multiplier)
+    
+    def modulusChanged(self, modulus):
+        self.circle.setModulus(modulus)
+    
         
 if __name__ == '__main__':
     # A single Application is required.
