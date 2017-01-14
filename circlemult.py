@@ -1,8 +1,9 @@
 import sys
 import math
-from PyQt5.QtCore import QRectF
-from PyQt5.QtGui import QPainter
-from PyQt5.QtWidgets import QApplication, QWidget, QHBoxLayout, QVBoxLayout, QLabel, QSpinBox
+
+from PyQt5.QtCore import QRectF, Qt
+from PyQt5.QtGui import QPainter, QImageWriter, QPixmap, QPalette
+from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout, QLabel, QSpinBox, QPushButton, QFileDialog
 
 radians = 2.0 * math.pi
 
@@ -24,12 +25,17 @@ def getLineSegments(multiplier, modulus, radius):
 
 
 # This class draws the circle and lines
-class CircleWidget(QWidget):
+class CircleWidget(QLabel):
     def __init__(self, parent=None):
         super(CircleWidget, self).__init__(parent)
         self.multiplier = 0
         self.modulus = 0
         
+        pal = QPalette()
+        pal.setColor(QPalette.Background, Qt.white)
+        self.setAutoFillBackground(True)
+        self.setPalette(pal)
+
     def setMultiplier(self, multiplier):
         self.multiplier = multiplier
         self.update()
@@ -40,6 +46,7 @@ class CircleWidget(QWidget):
         
     def paintEvent(self, event):
         painter = QPainter(self)
+        
         painter.setRenderHint(QPainter.Antialiasing, True)
         painter.translate(self.width() / 2, self.height() / 2)
 
@@ -53,7 +60,12 @@ class CircleWidget(QWidget):
             start = segment[0]
             end = segment[1]
             painter.drawLine(start[0], start[1], end[0], end[1])
-            
+        
+    def saveImage(self):
+        image = QPixmap(self.size())
+        self.render(image)
+        image.save('/tmp/image.png')
+
 
 # This class sets up the main window
 class MainWindow(QWidget):
@@ -66,36 +78,40 @@ class MainWindow(QWidget):
         
     def initUI(self):
         # Set up the layout
-        layout = QHBoxLayout()
+        layout = QGridLayout()
         self.setLayout(layout)
         
         # Add the circle widget
         self.circle = CircleWidget()
         self.circle.setMultiplier(self.multiplier)
         self.circle.setModulus(self.modulus)
-        layout.addWidget(self.circle)
+        layout.addWidget(self.circle, 0, 0, -1, 1)
         
         # Add the buttons
-        buttons = QWidget()
-        buttons_layout = QVBoxLayout()
-        buttons.setLayout(buttons_layout)
-        
-        buttons_layout.addWidget(QLabel('multiplier:'))
+        layout.addWidget(QLabel('multiplier:'), 0, 1)
         self.mult_spinner = QSpinBox()
         self.mult_spinner.setMinimum(2)
         self.mult_spinner.setMaximum(2999)
         self.mult_spinner.setValue(self.multiplier)
         self.mult_spinner.valueChanged.connect(self.multiplierChanged)
-        buttons_layout.addWidget(self.mult_spinner)
+        self.mult_spinner.setMaximumWidth(100)
+        layout.addWidget(self.mult_spinner, 1, 1)
         
-        buttons_layout.addWidget(QLabel('modulus:'))
+        layout.addWidget(QLabel('modulus:'), 0, 2)
         self.mod_spinner = QSpinBox()
         self.mod_spinner.setMinimum(2)
         self.mod_spinner.setMaximum(2999)
         self.mod_spinner.setValue(self.modulus)
         self.mod_spinner.valueChanged.connect(self.modulusChanged)
-        buttons_layout.addWidget(self.mod_spinner)
-        layout.addWidget(buttons)
+        self.mod_spinner.setMaximumWidth(100)
+        layout.addWidget(self.mod_spinner, 1, 2)
+        
+        self.save_button = QPushButton("Save")
+        self.save_button.clicked.connect(self.circle.saveImage)
+        layout.addWidget(self.save_button, 2, 1, 1, -1)
+        
+        # Prettiness
+        layout.setRowStretch(3, 100)
         
         self.setGeometry(200, 200, 800, 600)
         self.setWindowTitle('Multiplication Circle')
