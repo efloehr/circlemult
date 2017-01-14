@@ -82,12 +82,16 @@ class MainWindow(QWidget):
         
         buttons_layout.addWidget(QLabel('multiplier:'))
         self.mult_spinner = QSpinBox()
+        self.mult_spinner.setMinimum(2)
+        self.mult_spinner.setMaximum(2999)
         self.mult_spinner.setValue(self.multiplier)
         self.mult_spinner.valueChanged.connect(self.multiplierChanged)
         buttons_layout.addWidget(self.mult_spinner)
         
         buttons_layout.addWidget(QLabel('modulus:'))
         self.mod_spinner = QSpinBox()
+        self.mod_spinner.setMinimum(2)
+        self.mod_spinner.setMaximum(2999)
         self.mod_spinner.setValue(self.modulus)
         self.mod_spinner.valueChanged.connect(self.modulusChanged)
         buttons_layout.addWidget(self.mod_spinner)
