@@ -68,7 +68,8 @@ class CircleWidget(QLabel):
         formats = QImageWriter.supportedImageFormats()
         formats = map(lambda format: "*.{}".format(bytes(format).decode("utf-8")), formats)
         
-        path = QFileDialog.getSaveFileName(self, self.tr("Save Image"), "",
+        path = QFileDialog.getSaveFileName(self, self.tr("Save Image"),
+                                           "{}_{}.png".format(self.multiplier, self.modulus),
                                            self.tr("Image files ({})").format(" ".join(formats)))
 
         filename = path[0]
