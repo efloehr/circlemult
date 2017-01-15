@@ -64,7 +64,18 @@ class CircleWidget(QLabel):
     def saveImage(self):
         image = QPixmap(self.size())
         self.render(image)
-        image.save('/tmp/image.png')
+        
+        formats = QImageWriter.supportedImageFormats()
+        formats = map(lambda format: "*.{}".format(bytes(format).decode("utf-8")), formats)
+        
+        path = QFileDialog.getSaveFileName(self, self.tr("Save Image"), "",
+                                           self.tr("Image files ({})").format(" ".join(formats)))
+
+        filename = path[0]
+        if filename is not None and filename != '':
+            if not image.save(filename):
+                QMessageBox.warning(self, self.tr("Save Image"),
+                                    self.tr("Failed to save file at the specified location."))        
 
 
 # This class sets up the main window
