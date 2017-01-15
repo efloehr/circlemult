@@ -2,4 +2,20 @@ Inspired by the Mathlogger video:
 
 https://www.youtube.com/watch?v=qhbuKbxJsk8
 
+This program makes the circles and lines shown in the video above.
+
+They are made by placing points equally around a circle. The number of points to place is called
+the modulus.
+
+Each point is numbered from zero to the modulus minus one. As you go around the second time, each point
+also has the number modulus plus its number.
+
+Lines are drawn by taking the point number, multiplying by the given multiplier, and then drawing a
+line from that point to the point identified by the new number.
+
+For example, with a multiplier of 3 and a modulus of 10, a line is drawn from point 1 to point 3 (1 * 3),
+from point 2 to point 6 (2 * 3), from point 3 to point 9 (3 * 3), from point 4 to point 2 (4 * 3 modulo 10),
+and so on.
+
+With this program you can resize the window, enter the multiplier and modulus, and save the resulting image.
 
